@@ -47,6 +47,81 @@ class DashboardController extends AbstractActionController
         return array('form' => $form);
     }
 
+    public function editPrizeAction()
+    {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if (!$id) {
+            return $this->redirect()->toRoute('dashboard', array(
+                'action' => 'addPrize'
+            ));
+        }
+
+        // Get the Album with the specified id.  An exception is thrown
+        // if it cannot be found, in which case go to the index page.
+        try {
+            $prize = $this->getPrizeTable()->getPrize($id);
+        }
+        catch (\Exception $ex) {
+            return $this->redirect()->toRoute('dashboard', array(
+                'action' => 'prizes'
+            ));
+        }
+
+        $form  = new PrizeForm();
+        $form->bind($prize);
+        $form->get('submit')->setAttribute('value', 'Edit');
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $form->setInputFilter($prize->getInputFilter());
+            $form->setData($request->getPost());
+
+            if ($form->isValid()) {
+                $this->getPrizeTable()->savePrize($prize);
+
+                // Redirect to list of albums
+                return $this->redirect()->toRoute('dashboard', array(
+                    'action' => 'prizes'
+                ));
+            }
+        }
+
+        return array(
+            'id' => $id,
+            'form' => $form,
+        );
+    }
+
+    public function deletePrizeAction()
+    {
+        $id = (int) $this->params()->fromRoute('id', 0);
+        if (!$id) {
+            return $this->redirect()->toRoute('dashboard', array(
+                'action' => 'prizes'
+            ));
+        }
+
+        $request = $this->getRequest();
+        if ($request->isPost()) {
+            $del = $request->getPost('del', 'No');
+
+            if ($del == 'Yes') {
+                $id = (int) $request->getPost('id');
+                $this->getPrizeTable()->deletePrize($id);
+            }
+
+            // Redirect to list of albums
+            return $this->redirect()->toRoute('dashboard', array(
+                'action' => 'prizes'
+            ));
+        }
+
+        return array(
+            'id'    => $id,
+            'prize' => $this->getPrizeTable()->getPrize($id)
+        );
+    }
+
     public function getPhoneNumberTable()
     {
         if (!$this->phoneNumberTable) {
