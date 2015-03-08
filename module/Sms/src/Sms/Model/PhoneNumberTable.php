@@ -43,8 +43,7 @@ class PhoneNumberTable {
     {
         $data = array(
             'number' => $phoneNumber->number,
-            'available' => $phoneNumber->available,
-            'prizeId' => $phoneNumber->prizeId
+            'available' => $phoneNumber->available
         );
 
         $id = (int) $phoneNumber->id;

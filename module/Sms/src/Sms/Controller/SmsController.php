@@ -3,7 +3,9 @@ namespace Sms\Controller;
 
 
 use AP_XmlStrategy\View\Model\XmlModel;
+use Sms\Model\PhoneNumber;
 use Zend\Mvc\Controller\AbstractActionController;
+use ZendTest\Form\TestAsset\Entity\Phone;
 
 class SmsController extends AbstractActionController
 {
@@ -29,10 +31,15 @@ class SmsController extends AbstractActionController
     {
         $xmlModel = new XmlModel();
         $xmlModel->setRootNode('Response');
-        if (!$this->isRegistered($number)) {
+        if ($this->isRegistered($number)) {
             $xmlModel->setVariables(array('Message' => 'You are already registered!'));
             return $xmlModel;
         }
+
+        $phoneNumber = new PhoneNumber();
+        $phoneNumber->number = $number;
+
+        $this->getPhoneNumberTable()->saveNumber($phoneNumber);
 
         $xmlModel->setVariables(array('Message' => 'You are now registered!'));
 
@@ -44,7 +51,8 @@ class SmsController extends AbstractActionController
         try{
             $this->getPhoneNumberTable()->lookUpByNumber($number);
             return true;
-        } catch(\Exception $e) {}
+        } catch(\Exception $e) {
+        }
 
         return false;
     }

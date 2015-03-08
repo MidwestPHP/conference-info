@@ -11,7 +11,8 @@
     "php": ">=5.3.3",
     "zendframework/zendframework": "2.3.*",
     "twilio/sdk": "3.13.0",
-    "ap/ap-xml-strategy": "dev-master"
+    "ap/ap-xml-strategy": "dev-master",
+    "zf-commons/zfc-user": "dev-master"
   },
   "require-dev": {
     "phpmd/phpmd" : "@stable",

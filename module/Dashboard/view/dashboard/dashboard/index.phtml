@@ -1,0 +1,10 @@
+<ul class="nav nav-pills">
+    <li role="presentation" class="active"><a href="#">Home</a></li>
+    <li role="presentation"><a href="#">Prizes</a></li>
+    <li role="presentation"><a href="#">Numbers</a></li>
+</ul>
+<ul>
+<?php foreach ($numbers as $number): ?>
+<li><?php echo $number->number; ?></li>
+<?php endforeach; ?>
+</ul>
