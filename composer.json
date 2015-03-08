@@ -1,15 +1,25 @@
 {
-    "name": "zendframework/skeleton-application",
-    "description": "Skeleton Application for ZF2",
-    "license": "BSD-3-Clause",
-    "keywords": [
-        "framework",
-        "zf2"
-    ],
-    "homepage": "http://framework.zend.com/",
-    "require": {
-        "php": ">=5.3.3",
-        "zendframework/zendframework": "2.3.*",
-        "twilio/sdk": "3.13.0"
+  "name": "zendframework/skeleton-application",
+  "description": "Skeleton Application for ZF2",
+  "license": "BSD-3-Clause",
+  "keywords": [
+    "framework",
+    "zf2"
+  ],
+  "homepage": "http://framework.zend.com/",
+  "require": {
+    "php": ">=5.3.3",
+    "zendframework/zendframework": "2.3.*",
+    "twilio/sdk": "3.13.0",
+    "ap/ap-xml-strategy": "dev-master"
+  },
+  "require-dev": {
+    "phpmd/phpmd" : "@stable",
+    "squizlabs/php_codesniffer": "2.*"
+  },
+  "autoload": {
+    "psr-0": {
+      "Sms": "module/Sms/src/"
     }
+  }
 }
