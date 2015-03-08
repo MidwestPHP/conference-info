@@ -14,6 +14,21 @@ $app->get('/', function () use ($app) {
 ->bind('homepage')
 ;
 
+$app->post('/sms', function(Request $request) use ($app) {
+    $response = new Response();
+    $response->headers->set('Content-Type','text/xml');
+    $response->send();
+    $number = $request->request->get('From');
+    $response->headers->set('Content-Type', 'text/xml');
+
+    $message = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    $message .= "<Response>\n";
+    $message .= "<Message>Hello, {$number}</Message>\n";
+    $message .= "</Response>\n";
+
+    return $message;
+});
+
 $app->error(function (\Exception $e, Request $request, $code) use ($app) {
     if ($app['debug']) {
         return;
