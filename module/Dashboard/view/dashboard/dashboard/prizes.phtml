@@ -1,3 +1,8 @@
+<ul class="nav nav-pills">
+    <li role="presentation"><a href="/dashboard">Home</a></li>
+    <li role="presentation" class="active"><a href="/dashboard/prizes">Prizes</a></li>
+    <li role="presentation"><a href="/dashboard/trigger">Trigger Giveaway</a></li>
+</ul>
 <?php
 $title = 'Avaliable Prizes';
 $this->headTitle($title);
@@ -16,7 +21,7 @@ $this->headTitle($title);
     <?php foreach ($prizes as $prize) : ?>
         <tr>
             <td><?php echo $this->escapeHtml($prize->name);?></td>
-            <td><?php echo ($prize->available == NULL) ? 'NO' : 'YES';?></td>
+            <td><?php echo ($prize->available == 1) ? 'NO' : 'YES';?></td>
             <td>
                 <?php if($prize->available == NULL): ?>
                 <a href="<?php echo $this->url('dashboard',

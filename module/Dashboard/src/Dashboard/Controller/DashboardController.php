@@ -3,6 +3,7 @@ namespace Dashboard\Controller;
 
 
 use Dashboard\Form\PrizeForm;
+use Sms\Model\PhoneNumber;
 use Sms\Model\Prize;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -18,6 +19,9 @@ class DashboardController extends AbstractActionController
 
     public function indexAction()
     {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
         return new ViewModel(array('numbers' => $this->getPhoneNumberTable()->fetchAll()));
     }
 
@@ -27,11 +31,17 @@ class DashboardController extends AbstractActionController
 
     public function prizesAction()
     {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
         return new ViewModel(array('prizes' => $this->getPrizeTable()->fetchAll()));
     }
 
     public function addPrizeAction()
     {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
         $form = new PrizeForm();
         $form->get('submit')->setValue('Add');
 
@@ -55,7 +65,10 @@ class DashboardController extends AbstractActionController
 
     public function editPrizeAction()
     {
-        $id = (int) $this->params()->fromRoute('id', 0);
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
+        $id = (int)$this->params()->fromRoute('id', 0);
         if (!$id) {
             return $this->redirect()->toRoute('dashboard', array(
                 'action' => 'addPrize'
@@ -66,14 +79,13 @@ class DashboardController extends AbstractActionController
         // if it cannot be found, in which case go to the index page.
         try {
             $prize = $this->getPrizeTable()->getPrize($id);
-        }
-        catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return $this->redirect()->toRoute('dashboard', array(
                 'action' => 'prizes'
             ));
         }
 
-        $form  = new PrizeForm();
+        $form = new PrizeForm();
         $form->bind($prize);
         $form->get('submit')->setAttribute('value', 'Edit');
 
@@ -100,7 +112,10 @@ class DashboardController extends AbstractActionController
 
     public function deletePrizeAction()
     {
-        $id = (int) $this->params()->fromRoute('id', 0);
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
+        $id = (int)$this->params()->fromRoute('id', 0);
         if (!$id) {
             return $this->redirect()->toRoute('dashboard', array(
                 'action' => 'prizes'
@@ -112,7 +127,7 @@ class DashboardController extends AbstractActionController
             $del = $request->getPost('del', 'No');
 
             if ($del == 'Yes') {
-                $id = (int) $request->getPost('id');
+                $id = (int)$request->getPost('id');
                 $this->getPrizeTable()->deletePrize($id);
             }
 
@@ -123,7 +138,7 @@ class DashboardController extends AbstractActionController
         }
 
         return array(
-            'id'    => $id,
+            'id' => $id,
             'prize' => $this->getPrizeTable()->getPrize($id)
         );
     }
@@ -133,34 +148,59 @@ class DashboardController extends AbstractActionController
      */
 
     /*
-     * START
+     * START triggering prizes
      */
 
     public function triggerAction()
     {
+        if (!$this->zfcUserAuthentication()->hasIdentity()) {
+            $this->redirect()->toRoute('zfcuser');
+        }
         // Get the random number
-        $number = $this->getPhoneNumberTable()->selectRandomNumber();
-        var_dump($number);
+        $numbers = $this->getPhoneNumberTable()->selectAvailableNumbers();
+
+        $count = count($numbers);
+
+        $randomNumber = mt_rand(0, $count - 1);
+
+        foreach($numbers as $i=>$number) {
+            if($i == $randomNumber) {
+                $winner = $number;
+                break;
+            }
+        }
+
 
         // Get the random prize
-        $prize = $this->getPrizeTable()->selectRandomPrize();
-        var_dump($prize);
+        $prizes = $this->getPrizeTable()->selectAvailablePrizes();
+
+        $count = count($prizes);
+
+        $randomNumber = mt_rand(0, $count - 1);
+
+        foreach($prizes as $i=>$value) {
+            if($i == $randomNumber) {
+                $prize = $value;
+                break;
+            }
+        }
 
         // Send the message that they won X prize
-        $message = $this->getTwilioService()->sendSms($number->number, "Congrats. You won {$prize->name}. Come to the registration desk to claim your prize.");
+//        $message = $this->getTwilioService()->sendSms($number->number, "Congrats. You won {$prize->name}. Come to the registration desk to claim your prize.");
 
         // Log the number to not trigger it again
-        $number->available = 0;
-        $this->getPhoneNumberTable()->saveNumber($number);
+        $winner->available = 0;
+        $this->getPhoneNumberTable()->saveNumber($winner);
 
         // log the price to not trigger it again
         $prize->available = 0;
         $this->getPrizeTable()->savePrize($prize);
-        die();
+
+        return new ViewModel(array('number' => $number, 'prize' => $prize));
     }
 
     /*
-     * END
+     * END triggering prizes
      */
 
     public function getTwilioService()

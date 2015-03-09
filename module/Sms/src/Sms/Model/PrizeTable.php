@@ -54,31 +54,12 @@ class PrizeTable {
         $this->tableGateway->delete(array('id' => (int) $id));
     }
 
-    public function selectRandomPrize()
+    public function selectAvailablePrizes()
     {
         $resultSet = $this->tableGateway->select(function (Select $select) {
-            $select->columns(array('maxId' => new Expression('MAX(id)'), 'minId' => new Expression('MIN(id)')));
             $select->where(array('available' => 1));
         });
 
-        $row = $resultSet->current();
-
-        return $this->getRandomRecord($row->minId, $row->maxId);
-    }
-
-    public function getRandomRecord($minId, $maxId)
-    {
-        $number = mt_rand($minId, $maxId);
-
-        try {
-            $result = $this->getPrize($number);
-            if (0 === $result->available) {
-                self::getRandomRecord($minId, $maxId);
-            }
-            return $result;
-        } catch (\Exception $e) {
-            self::getRandomRecord($minId, $maxId);
-        }
-        return false;
+        return $resultSet;
     }
 }

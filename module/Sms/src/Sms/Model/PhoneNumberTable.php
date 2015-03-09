@@ -42,31 +42,13 @@ class PhoneNumberTable
         return $row;
     }
 
-    public function selectRandomNumber()
+    public function selectAvailableNumbers()
     {
         $resultSet = $this->tableGateway->select(function (Select $select) {
-            $select->columns(array('minId' => new Expression('MIN(id)'), 'maxId' => new Expression('MAX(id)')));
             $select->where(array('available' => 1));
         });
 
-        $row = $resultSet->current();
-        return $this->getRandomRecord($row->minId, $row->maxId);
-    }
-
-    public function getRandomRecord($min, $max)
-    {
-        $number = mt_rand($min, $max);
-
-        try {
-            $result = $this->getNumber($number);
-            if (0 === $result->available) {
-                self::getRandomRecord($min, $max);
-            }
-            return $result;
-        } catch (\Exception $e) {
-            self::getRandomRecord($min, $max);
-        }
-        return false;
+        return $resultSet;
     }
 
     public function saveNumber(PhoneNumber $phoneNumber)
