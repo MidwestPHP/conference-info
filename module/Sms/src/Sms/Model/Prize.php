@@ -10,6 +10,10 @@ class Prize
     public $id;
     public $name;
     public $available;
+    
+    public $minId;
+    public $maxId;
+
     protected $inputFilter;
 
 
@@ -17,7 +21,10 @@ class Prize
     {
         $this->id = (!empty($data['id'])) ? $data['id'] : null;
         $this->name = (!empty($data['name'])) ? $data['name'] : null;
-        $this->available = (!empty($data['available'])) ? $data['available'] : null;
+        $this->available = (!empty($data['available'])) ? $data['available'] : 1;
+
+        $this->minId = (!empty($data['minId'])) ? $data['minId'] : null;
+        $this->maxId = (!empty($data['maxId'])) ? $data['maxId'] : null;
     }
 
     // Add content to these methods:

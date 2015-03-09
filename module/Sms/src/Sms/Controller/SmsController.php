@@ -14,13 +14,18 @@ class SmsController extends AbstractActionController
 
     public function indexAction()
     {
-        $number = '612-270-8838';
-        $something = 'register';
+        $number = $this->getREquest()->getQuery('From');
+        $body = $this->getREquest()->getQuery('Body');
         $view = null;
 
-        switch($something) {
+        switch($body) {
             case 'register':
                 $view = $this->register($number);
+                break;
+            default:
+                $xmlModel = new XmlModel();
+                $xmlModel->setRootNode('Response');
+                $xmlModel->setVariables(array('Message' => 'Text "register" to register for the prize give away'));
                 break;
         }
 
@@ -38,6 +43,7 @@ class SmsController extends AbstractActionController
 
         $phoneNumber = new PhoneNumber();
         $phoneNumber->number = $number;
+        $phoneNumber->available = 1;
 
         $this->getPhoneNumberTable()->saveNumber($phoneNumber);
 

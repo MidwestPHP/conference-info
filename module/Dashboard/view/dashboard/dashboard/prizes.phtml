@@ -10,16 +10,20 @@ $this->headTitle($title);
 <table class="table">
     <tr>
         <th>Name</th>
+        <th>Distributed</th>
         <th>&nbsp;</th>
     </tr>
     <?php foreach ($prizes as $prize) : ?>
         <tr>
             <td><?php echo $this->escapeHtml($prize->name);?></td>
+            <td><?php echo ($prize->available == NULL) ? 'NO' : 'YES';?></td>
             <td>
+                <?php if($prize->available == NULL): ?>
                 <a href="<?php echo $this->url('dashboard',
                     array('action'=>'editPrize', 'id' => $prize->id));?>">Edit</a>
                 <a href="<?php echo $this->url('dashboard',
                     array('action'=>'deletePrize', 'id' => $prize->id));?>">Delete</a>
+            <?php endif; ?>
             </td>
         </tr>
     <?php endforeach; ?>

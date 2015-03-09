@@ -2,6 +2,7 @@
 namespace Dashboard;
 
 
+use Dashboard\Model\Twilio;
 use Sms\Model\PhoneNumber;
 use Sms\Model\PhoneNumberTable;
 use Sms\Model\Prize;
@@ -58,6 +59,14 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
                     $resultSetPrototype->setArrayObjectPrototype(new Prize());
                     return new TableGateway('prizes', $dbAdapter, null, $resultSetPrototype);
                 },
+                'Dashboard\Model\Twilio' => function($sm) {
+                    $config = $sm->get('config');
+                    $twilioService = new \Services_Twilio($config['twilio']['sid'], $config['twilio']['token']);
+
+                    $twilio = new Twilio($twilioService);
+                    $twilio->number = $config['twilio']['number'];
+                    return $twilio;
+                }
             )
         );
     }

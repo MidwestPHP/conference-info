@@ -14,10 +14,16 @@ class DashboardController extends AbstractActionController
 
     private $prizeTable;
 
+    private $twilioService;
+
     public function indexAction()
     {
         return new ViewModel(array('numbers' => $this->getPhoneNumberTable()->fetchAll()));
     }
+
+    /*
+     * START PRIZE ACTIONS
+     */
 
     public function prizesAction()
     {
@@ -120,6 +126,51 @@ class DashboardController extends AbstractActionController
             'id'    => $id,
             'prize' => $this->getPrizeTable()->getPrize($id)
         );
+    }
+
+    /*
+     * END PRIZE ACTIONS
+     */
+
+    /*
+     * START
+     */
+
+    public function triggerAction()
+    {
+        // Get the random number
+        $number = $this->getPhoneNumberTable()->selectRandomNumber();
+        var_dump($number);
+
+        // Get the random prize
+        $prize = $this->getPrizeTable()->selectRandomPrize();
+        var_dump($prize);
+
+        // Send the message that they won X prize
+        $message = $this->getTwilioService()->sendSms($number->number, "Congrats. You won {$prize->name}. Come to the registration desk to claim your prize.");
+
+        // Log the number to not trigger it again
+        $number->available = 0;
+        $this->getPhoneNumberTable()->saveNumber($number);
+
+        // log the price to not trigger it again
+        $prize->available = 0;
+        $this->getPrizeTable()->savePrize($prize);
+        die();
+    }
+
+    /*
+     * END
+     */
+
+    public function getTwilioService()
+    {
+        if (!$this->twilioService) {
+            $sm = $this->getServiceLocator();
+            $this->twilioService = $sm->get('Dashboard\Model\Twilio');
+        }
+
+        return $this->twilioService;
     }
 
     public function getPhoneNumberTable()

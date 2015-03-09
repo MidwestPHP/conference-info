@@ -1,9 +1,12 @@
 <?php
 namespace Sms\Model;
 
+use Zend\Db\Sql\Expression;
+use Zend\Db\Sql\Select;
 use Zend\Db\TableGateway\TableGateway;
 
-class PhoneNumberTable {
+class PhoneNumberTable
+{
     protected $tableGateway;
 
     public function __construct(TableGateway $tableGateway)
@@ -19,7 +22,7 @@ class PhoneNumberTable {
 
     public function getNumber($id)
     {
-        $id = (int) $id;
+        $id = (int)$id;
         $rowset = $this->tableGateway->select(array('id' => $id));
         $row = $rowset->current();
         if (!$row) {
@@ -39,6 +42,33 @@ class PhoneNumberTable {
         return $row;
     }
 
+    public function selectRandomNumber()
+    {
+        $resultSet = $this->tableGateway->select(function (Select $select) {
+            $select->columns(array('minId' => new Expression('MIN(id)'), 'maxId' => new Expression('MAX(id)')));
+            $select->where(array('available' => 1));
+        });
+
+        $row = $resultSet->current();
+        return $this->getRandomRecord($row->minId, $row->maxId);
+    }
+
+    public function getRandomRecord($min, $max)
+    {
+        $number = mt_rand($min, $max);
+
+        try {
+            $result = $this->getNumber($number);
+            if (0 === $result->available) {
+                self::getRandomRecord($min, $max);
+            }
+            return $result;
+        } catch (\Exception $e) {
+            self::getRandomRecord($min, $max);
+        }
+        return false;
+    }
+
     public function saveNumber(PhoneNumber $phoneNumber)
     {
         $data = array(
@@ -46,7 +76,7 @@ class PhoneNumberTable {
             'available' => $phoneNumber->available
         );
 
-        $id = (int) $phoneNumber->id;
+        $id = (int)$phoneNumber->id;
         if ($id == 0) {
             $this->tableGateway->insert($data);
         } else {
@@ -60,6 +90,6 @@ class PhoneNumberTable {
 
     public function deleteNumber($id)
     {
-        $this->tableGateway->delete(array('id' => (int) $id));
+        $this->tableGateway->delete(array('id' => (int)$id));
     }
 }
