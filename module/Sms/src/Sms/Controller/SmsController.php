@@ -14,8 +14,8 @@ class SmsController extends AbstractActionController
 
     public function indexAction()
     {
-        $number = $this->getREquest()->getQuery('From');
-        $body = $this->getREquest()->getQuery('Body');
+        $number = $this->getRequest()->getPost('From');
+        $body = $this->getRequest()->getPost('Body');
         $view = null;
 
         $body = strtolower($body);
