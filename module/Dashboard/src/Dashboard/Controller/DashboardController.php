@@ -186,7 +186,7 @@ class DashboardController extends AbstractActionController
         }
 
         // Send the message that they won X prize
-//        $message = $this->getTwilioService()->sendSms($number->number, "Congrats. You won {$prize->name}. Come to the registration desk to claim your prize.");
+        $message = $this->getTwilioService()->sendSms($winner->number, "Congrats. You won {$prize->name}. Come to the registration desk to claim your prize.");
 
         // Log the number to not trigger it again
         $winner->available = 0;
