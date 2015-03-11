@@ -18,14 +18,16 @@ class SmsController extends AbstractActionController
         $body = $this->getREquest()->getQuery('Body');
         $view = null;
 
+        $body = strtolower($body);
+
         switch($body) {
             case 'register':
                 $view = $this->register($number);
                 break;
             default:
-                $xmlModel = new XmlModel();
-                $xmlModel->setRootNode('Response');
-                $xmlModel->setVariables(array('Message' => 'Text "register" to register for the prize give away'));
+                $view = new XmlModel();
+                $view->setRootNode('Response');
+                $view->setVariables(array('Message' => 'Text "register" to register for the prize give away'));
                 break;
         }
 
