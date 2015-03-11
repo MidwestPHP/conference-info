@@ -16,4 +16,9 @@ return array(
          'username' => 'YOUR USERNAME HERE',
          'password' => 'YOUR PASSWORD HERE',
      ),
+     'twilio' => array(
+         'sid' => '',
+         'token' => '',
+         'number' => ''
+     )
  );
